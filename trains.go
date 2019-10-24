@@ -5,8 +5,8 @@ import (
 	"sync"
 )
 
-func platform(s string, wg *sync.WaitGroup, mq *chan string) {
-	fmt.Println(<-*mq + " arrived to platform " + s)
+func platform(s string, wg *sync.WaitGroup, mq chan string) {
+	fmt.Println(<-mq + " arrived to platform " + s)
 	wg.Done()
 }
 
@@ -19,9 +19,9 @@ func main() {
 	defer wg.Wait()
 
 	// Add some coroutines
-	go platform("one", &wg, &messageQueue)
-	go platform("two", &wg, &messageQueue)
-	go platform("three", &wg, &messageQueue)
+	go platform("one", &wg, messageQueue)
+	go platform("two", &wg, messageQueue)
+	go platform("three", &wg, messageQueue)
 	wg.Add(3) // ... and add them into counter
 
 	// Send some trains into queue

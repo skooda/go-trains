@@ -15,9 +15,11 @@ type station struct {
 }
 
 func platform(station station, id int, wg *sync.WaitGroup, mq chan train) {
-	train := <-mq
-	fmt.Println(station.name + ": Train " + strconv.Itoa(train.id) + " arrived to platform " + strconv.Itoa(id))
-	wg.Done()
+	for true {
+		train := <-mq
+		fmt.Println(station.name + ": Train " + strconv.Itoa(train.id) + " arrived to platform " + strconv.Itoa(id))
+		wg.Done()
+	}
 }
 
 func main() {
@@ -38,13 +40,13 @@ func main() {
 	go platform(paris, 1, &wg, messageQueue)
 	go platform(paris, 2, &wg, messageQueue)
 	go platform(paris, 3, &wg, messageQueue)
-	wg.Add(5) // ... and add them into counter
 
 	// Send some trains into queue
-	messageQueue <- train{id: 1}
-	messageQueue <- train{id: 2}
-	messageQueue <- train{id: 3}
-	messageQueue <- train{id: 4}
-	messageQueue <- train{id: 5}
+	trainCount := 10
+	wg.Add(trainCount) // ... and add them into counter
+
+	for i := 0; i < trainCount; i++ {
+		messageQueue <- train{id: i}
+	}
 
 }

@@ -12,12 +12,14 @@ func platform(s string, wg *sync.WaitGroup) {
 
 func main() {
 
+	// Add waitgroup as counter for coroutines
 	var wg sync.WaitGroup
+	defer wg.Wait()
 
+	// Add some coroutines
 	go platform("one", &wg)
 	go platform("two", &wg)
 	go platform("three", &wg)
-	wg.Add(3)
+	wg.Add(3) // ... and add them into counter
 
-	wg.Wait()
 }

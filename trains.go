@@ -2,17 +2,22 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"sync"
 )
 
-func platform(s string) {
+func platform(s string, wg *sync.WaitGroup) {
 	fmt.Println("Train arrived to platform " + s)
+	wg.Done()
 }
 
 func main() {
-	go platform("one")
-	go platform("two")
-	go platform("three")
-	time.Sleep(time.Second)
 
+	var wg sync.WaitGroup
+
+	go platform("one", &wg)
+	go platform("two", &wg)
+	go platform("three", &wg)
+	wg.Add(3)
+
+	wg.Wait()
 }

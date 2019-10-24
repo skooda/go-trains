@@ -10,9 +10,13 @@ type train struct {
 	id int
 }
 
-func platform(s string, wg *sync.WaitGroup, mq chan train) {
+type station struct {
+	name string
+}
+
+func platform(station station, id int, wg *sync.WaitGroup, mq chan train) {
 	train := <-mq
-	fmt.Println("Train " + strconv.Itoa(train.id) + " arrived to platform " + s)
+	fmt.Println(station.name + ": Train " + strconv.Itoa(train.id) + " arrived to platform " + strconv.Itoa(id))
 	wg.Done()
 }
 
@@ -24,15 +28,23 @@ func main() {
 	var wg sync.WaitGroup
 	defer wg.Wait()
 
-	// Add some coroutines
-	go platform("one", &wg, messageQueue)
-	go platform("two", &wg, messageQueue)
-	go platform("three", &wg, messageQueue)
-	wg.Add(3) // ... and add them into counter
+	// Add some stations
+	prague := station{name: "Prague"}
+	paris := station{name: "Paris"}
+
+	// Add some platforms as coroutines
+	go platform(prague, 1, &wg, messageQueue)
+	go platform(prague, 2, &wg, messageQueue)
+	go platform(paris, 1, &wg, messageQueue)
+	go platform(paris, 2, &wg, messageQueue)
+	go platform(paris, 3, &wg, messageQueue)
+	wg.Add(5) // ... and add them into counter
 
 	// Send some trains into queue
 	messageQueue <- train{id: 1}
 	messageQueue <- train{id: 2}
 	messageQueue <- train{id: 3}
+	messageQueue <- train{id: 4}
+	messageQueue <- train{id: 5}
 
 }

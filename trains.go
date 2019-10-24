@@ -2,17 +2,23 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"sync"
 )
 
-func platform(s string, wg *sync.WaitGroup, mq chan string) {
-	fmt.Println(<-mq + " arrived to platform " + s)
+type train struct {
+	id int
+}
+
+func platform(s string, wg *sync.WaitGroup, mq chan train) {
+	train := <-mq
+	fmt.Println("Train " + strconv.Itoa(train.id) + " arrived to platform " + s)
 	wg.Done()
 }
 
 func main() {
 	// Init message queue
-	messageQueue := make(chan string)
+	messageQueue := make(chan train)
 
 	// Add waitgroup as counter for coroutines
 	var wg sync.WaitGroup
@@ -25,8 +31,8 @@ func main() {
 	wg.Add(3) // ... and add them into counter
 
 	// Send some trains into queue
-	messageQueue <- "Train 1"
-	messageQueue <- "Train 2"
-	messageQueue <- "Train 3"
+	messageQueue <- train{id: 1}
+	messageQueue <- train{id: 2}
+	messageQueue <- train{id: 3}
 
 }
